@@ -44,6 +44,8 @@ defmodule Twitter2Web.Router do
 
     resources "/users", UserController, except: [:new, :edit]
     resources "/tweets", TweetController, except: [:new, :edit]
+    # resources "/likes", LikeController, except: [:new, :edit]
+    post "/likes", LikeController, :like
   end
 
   scope "/api", Twitter2Web do

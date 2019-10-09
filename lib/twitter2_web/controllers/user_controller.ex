@@ -3,7 +3,6 @@ defmodule Twitter2Web.UserController do
 
   alias Twitter2.Users
   alias Twitter2.Users.User
-  alias Twitter2.Guardian
 
   action_fallback Twitter2Web.FallbackController
 

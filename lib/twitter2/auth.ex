@@ -41,7 +41,6 @@ defmodule Twitter2.Auth do
   defp get_by_email(email) when is_binary(email) do
     case Repo.get_by(User, email: email) do
       nil ->
-        Bcrypt.no_user_verify()
         {:error, "Login error"}
 
       user ->
@@ -50,6 +49,8 @@ defmodule Twitter2.Auth do
   end
 
   defp verify_password(password, %User{} = user) when is_binary(password) do
+    IO.puts("hacccccc")
+
     if Bcrypt.verify_pass(password, user.password) do
       {:ok, user}
     else

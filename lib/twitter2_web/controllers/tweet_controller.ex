@@ -3,6 +3,7 @@ defmodule Twitter2Web.TweetController do
 
   alias Twitter2.Tweets
   alias Twitter2.Tweets.Tweet
+  alias Twitter2.Repo
 
   action_fallback Twitter2Web.FallbackController
 
@@ -12,7 +13,11 @@ defmodule Twitter2Web.TweetController do
   end
 
   def create(conn, %{"tweet" => tweet_params}) do
-    with {:ok, %Tweet{} = tweet} <- Tweets.create_tweet(tweet_params) do
+    user = Guardian.Plug.current_resource(conn)
+
+    with data <- Map.merge(tweet_params, %{"user_id" => user.id}),
+         {:ok, %Tweet{} = tweet} <-
+           Tweets.create_tweet(data) do
       conn
       |> put_status(:created)
       |> put_resp_header("location", Routes.tweet_path(conn, :show, tweet))

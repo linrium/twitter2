@@ -17,8 +17,15 @@ defmodule Twitter2Web.AuthController do
   end
 
   def sign_in(conn, %{"email" => email, "password" => password}) do
-    result = Auth.sign_in(email, password)
-    conn |> render("jwt.json", data: result)
+    case Auth.sign_in(email, password) do
+      {:error, _} ->
+        conn
+        |> put_status(:unauthorized)
+        |> json(%{error: "Login error"})
+
+      result ->
+        conn |> render("jwt.json", data: result)
+    end
   end
 
   def gen_otp(conn, _params) do
