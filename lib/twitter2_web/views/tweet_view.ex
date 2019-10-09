@@ -1,6 +1,7 @@
 defmodule Twitter2Web.TweetView do
   use Twitter2Web, :view
   alias Twitter2Web.TweetView
+  alias Twitter2Web.UserView
 
   def render("index.json", %{tweets: tweets}) do
     %{data: render_many(tweets, TweetView, "tweet.json")}
@@ -11,6 +12,29 @@ defmodule Twitter2Web.TweetView do
   end
 
   def render("tweet.json", %{tweet: tweet}) do
-    %{id: tweet.id, content: tweet.content, like_count: tweet.like_count}
+    %{
+      id: tweet.id,
+      content: tweet.content,
+      like_count: tweet.like_count,
+      retweet_count: tweet.retweet_count,
+      user: UserView.render("user.json", %{user: tweet.user}),
+      original_tweet: render("original_tweet.json", %{tweet: tweet.original_tweet}),
+      inserted_at: to_string(tweet.inserted_at)
+    }
+  end
+
+  def render("original_tweet.json", %{tweet: tweet}) do
+    if tweet == nil do
+      nil
+    else
+      %{
+        id: tweet.id,
+        content: tweet.content,
+        like_count: tweet.like_count,
+        retweet_count: tweet.retweet_count,
+        user: UserView.render("user.json", %{user: tweet.user}),
+        inserted_at: to_string(tweet.inserted_at)
+      }
+    end
   end
 end

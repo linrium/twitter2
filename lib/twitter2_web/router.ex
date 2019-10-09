@@ -34,9 +34,9 @@ defmodule Twitter2Web.Router do
   scope "/api", Twitter2Web do
     pipe_through [:api, :jwt_authenticated]
 
-    post "/sign_out", AuthController, :sign_out
-    post "/gen_otp", AuthController, :gen_otp
-    post "/verify_otp", AuthController, :verify_otp
+    post "/sign-out", AuthController, :sign_out
+    post "/gen-otp", AuthController, :gen_otp
+    post "/verify-otp", AuthController, :verify_otp
   end
 
   scope "/api", Twitter2Web do
@@ -51,7 +51,7 @@ defmodule Twitter2Web.Router do
   scope "/api", Twitter2Web do
     pipe_through [:api]
 
-    post "/sign_up", AuthController, :sign_up
-    post "/sign_in", AuthController, :sign_in
+    post "/sign-up", AuthController, :sign_up
+    post "/sign-in", AuthController, :sign_in
   end
 end

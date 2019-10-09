@@ -1,6 +1,8 @@
 defmodule Twitter2Web.Endpoint do
   use Phoenix.Endpoint, otp_app: :twitter2
 
+  plug CORSPlug
+
   socket "/socket", Twitter2Web.UserSocket,
     websocket: true,
     longpoll: false
