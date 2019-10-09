@@ -9,7 +9,6 @@ defmodule Twitter2Web.UserController do
 
   def index(conn, _params) do
     token = Guardian.Plug.current_token(conn)
-    IO.puts("asdsad #{token}")
     users = Users.list_users()
     render(conn, "index.json", users: users)
   end

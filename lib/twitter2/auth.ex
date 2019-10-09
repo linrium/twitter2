@@ -11,21 +11,25 @@ defmodule Twitter2.Auth do
   end
 
   def sign_up(attrs \\ %{}) do
-    with {:ok, %User{} = user} <- Users.create_user(attrs),
-         {:ok, token, _claims} <- Guardian.encode_and_sign(user) do
-      %{token: token, user: user}
+    with {:ok, %User{} = user} <- Users.create_user(attrs) do
+      gen_token(user, false)
     end
   end
 
   def sign_in(email, password) do
     case email_password_auth(email, password) do
       {:ok, user} ->
-        with {:ok, token, _claims} <- Guardian.encode_and_sign(user) do
-          %{token: token, user: user}
-        end
+        gen_token(user, false)
 
       _ ->
         {:error, :unauthorized}
+    end
+  end
+
+  def gen_token(user, otp_verified) do
+    with data <- Jason.encode!(%{"id" => user.id, "otp_verified" => otp_verified}),
+         {:ok, token, _claims} <- Guardian.encode_and_sign(data) do
+      %{token: token, user: user}
     end
   end
 
@@ -47,7 +51,6 @@ defmodule Twitter2.Auth do
 
   defp verify_password(password, %User{} = user) when is_binary(password) do
     if Bcrypt.verify_pass(password, user.password) do
-      IO.puts("testtttt")
       {:ok, user}
     else
       {:error, :invalid_password}

@@ -21,6 +21,25 @@ defmodule Twitter2Web.AuthController do
     conn |> render("jwt.json", data: result)
   end
 
+  def gen_otp(conn, _params) do
+    user = Guardian.Plug.current_resource(conn)
+    otp = OneTimePassEcto.Base.gen_totp(user.otp_secret)
+
+    conn |> json(%{otp: otp})
+  end
+
+  def verify_otp(conn, %{"otp" => otp}) do
+    user = Guardian.Plug.current_resource(conn)
+    otp = OneTimePassEcto.Base.check_totp(otp, user.otp_secret)
+
+    if otp != false do
+      result = Auth.gen_token(user, true)
+      conn |> render("jwt.json", data: result)
+    else
+      {:error, :unauthorized}
+    end
+  end
+
   def sign_up(conn, params) do
     result = Auth.sign_up(params)
 
