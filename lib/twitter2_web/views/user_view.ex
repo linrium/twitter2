@@ -11,6 +11,10 @@ defmodule Twitter2Web.UserView do
   end
 
   def render("user.json", %{user: user}) do
-    %{id: user.id, username: user.username, email: user.email}
+    if user == nil do
+      nil
+    else
+      %{id: user.id, username: user.username, email: user.email}
+    end
   end
 end

@@ -9,6 +9,9 @@ defmodule Twitter2.Tweets.Tweet do
     field :reply_count, :integer, default: 0
     field :share_count, :integer, default: 0
 
+    field :liked_by_me, :integer, virtual: true
+    field :original_user, :integer, virtual: true
+
     belongs_to :original_tweet, Twitter2.Tweets.Tweet
     belongs_to :user, Twitter2.Users.User
 

@@ -4,6 +4,10 @@ defmodule Twitter2Web.TweetController do
 
   alias Twitter2.Tweets
   alias Twitter2.Tweets.Tweet
+  alias Twitter2.Users
+  alias Twitter2.Users.User
+  alias Twitter2.Likes
+  alias Twitter2.Likes.Like
   alias Twitter2.Repo
 
   action_fallback Twitter2Web.FallbackController
@@ -27,10 +31,24 @@ defmodule Twitter2Web.TweetController do
       end)
 
     tweets =
-      Tweet
-      |> order_by(^values)
-      |> Repo.all()
-      |> Repo.preload([:user, original_tweet: :user])
+      Repo.all(
+        from t in Tweet,
+          join: u in assoc(t, :user),
+          left_join: o in assoc(t, :original_tweet),
+          left_join: ou in assoc(o, :user),
+          left_join: l in Like,
+          on: l.user_id == t.user_id and l.tweet_id == t.id,
+          select_merge: %{
+            liked_by_me: is_nil(l.id),
+            user: u,
+            original_tweet: o,
+            original_user: ou
+          }
+      )
+
+    IO.inspect(tweets)
+
+    # |> Repo.preload([:user, original_tweet: :user])
 
     render(conn, "index.json", tweets: tweets)
   end

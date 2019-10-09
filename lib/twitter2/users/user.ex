@@ -12,6 +12,7 @@ defmodule Twitter2.Users.User do
     field :password_confirmation, :string, virtual: true
 
     has_many :tweets, Twitter2.Tweets.Tweet
+    has_many :likes, Twitter2.Likes.Like
 
     timestamps()
   end

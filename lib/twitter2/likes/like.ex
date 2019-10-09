@@ -3,8 +3,8 @@ defmodule Twitter2.Likes.Like do
   import Ecto.Changeset
 
   schema "likes" do
-    field :user_id, :id
-    field :tweet_id, :id
+    belongs_to :user, Twitter2.Users.User
+    belongs_to :tweet, Twitter2.Tweets.Tweet
 
     timestamps()
   end
