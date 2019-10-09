@@ -21,6 +21,10 @@ defmodule Twitter2.Sessions do
     Repo.all(Session)
   end
 
+  def get_session_by(attrs \\ []) do
+    Repo.get_by!(Session, attrs)
+  end
+
   @doc """
   Gets a single session.
 

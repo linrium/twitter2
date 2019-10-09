@@ -29,6 +29,8 @@ defmodule Twitter2Web.Router do
   scope "/api", Twitter2Web do
     pipe_through [:api, :jwt_authenticated]
 
+    post "/sign_out", AuthController, :sign_out
+
     resources "/users", UserController, except: [:new, :edit]
     resources "/tweets", TweetController, except: [:new, :edit]
     resources "/sessions", SessionController, except: [:new, :edit]

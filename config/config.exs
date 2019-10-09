@@ -11,6 +11,14 @@ config :twitter2, Twitter2.Guardian,
   issuer: "twitter2",
   secret_key: "OXb/zRcs1HkTHfxyiu4Lj6vZjcI46z0mAt3Tq+2bWyvhMRIIgkUVLkkrb7RousuI"
 
+config :guardian, Guardian.DB,
+  # Add your repository module
+  repo: Twitter2.Repo,
+  # default
+  schema_name: "guardian_tokens",
+  # default: 60 minutes
+  sweep_interval: 120
+
 config :twitter2,
   ecto_repos: [Twitter2.Repo]
 

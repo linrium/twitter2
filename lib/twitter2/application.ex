@@ -8,6 +8,7 @@ defmodule Twitter2.Application do
   def start(_type, _args) do
     # List all child processes to be supervised
     children = [
+      Guardian.DB.Token.SweeperServer,
       # Start the Ecto repository
       Twitter2.Repo,
       # Start the endpoint when the application starts

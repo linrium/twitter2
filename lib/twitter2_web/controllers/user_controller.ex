@@ -8,6 +8,8 @@ defmodule Twitter2Web.UserController do
   action_fallback Twitter2Web.FallbackController
 
   def index(conn, _params) do
+    token = Guardian.Plug.current_token(conn)
+    IO.puts("asdsad #{token}")
     users = Users.list_users()
     render(conn, "index.json", users: users)
   end
@@ -21,11 +23,11 @@ defmodule Twitter2Web.UserController do
     end
   end
 
-  def show(conn, _params) do
-    # user = Users.get_user!(id)
-    # render(conn, "show.json", user: user)
-    user = Guardian.Plug.current_resource(conn)
-    conn |> render("user.json", user: user)
+  def show(conn, %{"id" => id}) do
+    user = Users.get_user!(id)
+    render(conn, "show.json", user: user)
+    # user = Guardian.Plug.current_resource(conn)
+    # conn |> render("user.json", user: user)
   end
 
   def update(conn, %{"id" => id, "user" => user_params}) do
