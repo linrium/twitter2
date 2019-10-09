@@ -46,7 +46,8 @@ defmodule Twitter2.MixProject do
       {:bcrypt_elixir, "~> 2.0"},
       {:comeonin, "~> 5.1"},
       {:guardian, "~> 1.2"},
-      {:guardian_db, "~> 2.0"}
+      {:guardian_db, "~> 2.0"},
+      {:one_time_pass_ecto, "~> 1.0"}
     ]
   end
 

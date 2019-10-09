@@ -1,7 +1,7 @@
 defmodule Twitter2Web.PageController do
   use Twitter2Web, :controller
 
-  def index(conn, _params) do
-    render(conn, "index.html")
+  def index(_conn, _params) do
+    %{message: "Hello World"}
   end
 end

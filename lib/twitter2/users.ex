@@ -50,8 +50,11 @@ defmodule Twitter2.Users do
 
   """
   def create_user(attrs \\ %{}) do
+    otp_secret = OneTimePassEcto.Base.gen_secret(32)
+    changeset = Map.merge(attrs, %{"otp_secret" => otp_secret})
+
     %User{}
-    |> User.changeset(attrs)
+    |> User.changeset(changeset)
     |> Repo.insert()
   end
 

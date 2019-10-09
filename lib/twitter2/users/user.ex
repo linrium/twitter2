@@ -6,12 +6,12 @@ defmodule Twitter2.Users.User do
     field :email, :string
     field :password, :string
     field :username, :string
+    field :otp_secret, :string
     # Virtual fields
     field :password_hash, :string, virtual: true
     field :password_confirmation, :string, virtual: true
 
     has_many :tweets, Twitter2.Tweets.Tweet
-    has_many :sessions, Twitter2.Sessions.Session
 
     timestamps()
   end
@@ -19,8 +19,8 @@ defmodule Twitter2.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :email, :password_hash, :password_confirmation])
-    |> validate_required([:username, :email, :password_hash, :password_confirmation])
+    |> cast(attrs, [:username, :email, :password_hash, :password_confirmation, :otp_secret])
+    |> validate_required([:username, :email, :password_hash, :password_confirmation, :otp_secret])
     |> unique_constraint(:email)
     |> validate_format(:email, ~r/@/)
     |> validate_length(:password_hash, min: 4)

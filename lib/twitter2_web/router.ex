@@ -19,6 +19,11 @@ defmodule Twitter2Web.Router do
     plug Guardian.AuthPipeline
   end
 
+  pipeline :jwt_verified_otp do
+    plug Guardian.AuthPipeline
+    plug Guardian.Plug.EnsureOtp
+  end
+
   scope "/", Twitter2Web do
     pipe_through :browser
 
@@ -30,10 +35,15 @@ defmodule Twitter2Web.Router do
     pipe_through [:api, :jwt_authenticated]
 
     post "/sign_out", AuthController, :sign_out
+    post "/gen_otp", AuthController, :gen_otp
+    post "/verify_otp", AuthController, :verify_otp
+  end
+
+  scope "/api", Twitter2Web do
+    pipe_through [:api, :jwt_verified_otp]
 
     resources "/users", UserController, except: [:new, :edit]
     resources "/tweets", TweetController, except: [:new, :edit]
-    resources "/sessions", SessionController, except: [:new, :edit]
   end
 
   scope "/api", Twitter2Web do
