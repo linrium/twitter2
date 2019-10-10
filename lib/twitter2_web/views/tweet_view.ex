@@ -20,7 +20,6 @@ defmodule Twitter2Web.TweetView do
       liked_by_me: tweet.liked_by_me,
       user: UserView.render("user.json", %{user: tweet.user}),
       original_tweet: render("original_tweet.json", %{tweet: tweet.original_tweet}),
-      original_user: UserView.render("user.json", %{user: tweet.original_user}),
       inserted_at: to_string(tweet.inserted_at)
     }
   end
@@ -35,6 +34,7 @@ defmodule Twitter2Web.TweetView do
         like_count: tweet.like_count,
         retweet_count: tweet.retweet_count,
         liked_by_me: tweet.liked_by_me,
+        user: UserView.render("user.json", %{user: tweet.user}),
         inserted_at: to_string(tweet.inserted_at)
       }
     end

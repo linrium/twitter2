@@ -49,8 +49,6 @@ defmodule Twitter2.Auth do
   end
 
   defp verify_password(password, %User{} = user) when is_binary(password) do
-    IO.puts("hacccccc")
-
     if Bcrypt.verify_pass(password, user.password) do
       {:ok, user}
     else

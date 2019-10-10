@@ -3,32 +3,53 @@ defmodule Twitter2Web.UserControllerTest do
 
   alias Twitter2.Users
   alias Twitter2.Users.User
+  alias Twitter2.Auth
 
   @create_attrs %{
-    email: "some email",
-    password: "some password",
-    username: "some username"
+    "email" => "test@gmail.com",
+    "username" => "test",
+    "password" => "123456"
   }
   @update_attrs %{
-    email: "some updated email",
-    password: "some updated password",
-    username: "some updated username"
+    "email" => "test1@gmail.com",
+    "username" => "test1"
   }
-  @invalid_attrs %{email: nil, password: nil, username: nil}
+  @invalid_attrs %{"email" => nil, "username" => nil}
 
   def fixture(:user) do
-    {:ok, user} = Users.create_user(@create_attrs)
+    {:ok, user} =
+      Users.create_user(%{
+        "email" => "test0@gmail.com",
+        "username" => "test0",
+        "password" => "123456"
+      })
+
     user
   end
 
+  # Master 35k - 2 nam
+  # IELS 6.5
+  # Nhap hoc 2&3, 7&8
+
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    user = fixture(:user)
+    data = Auth.gen_token(user, true)
+
+    {:ok,
+     conn:
+       conn
+       |> put_req_header("accept", "application/json")
+       |> put_req_header("authorization", "Bearer #{data.token}")}
   end
 
   describe "index" do
     test "lists all users", %{conn: conn} do
       conn = get(conn, Routes.user_path(conn, :index))
-      assert json_response(conn, 200)["data"] == []
+      data = json_response(conn, 200)["data"]
+
+      assert match?(data, [
+               %{"email" => "test0@gmail.com", "username" => "test0"}
+             ])
     end
   end
 
@@ -41,9 +62,8 @@ defmodule Twitter2Web.UserControllerTest do
 
       assert %{
                "id" => id,
-               "email" => "some email",
-               "password" => "some password",
-               "username" => "some username"
+               "email" => "test@gmail.com",
+               "username" => "test"
              } = json_response(conn, 200)["data"]
     end
 
@@ -64,9 +84,8 @@ defmodule Twitter2Web.UserControllerTest do
 
       assert %{
                "id" => id,
-               "email" => "some updated email",
-               "password" => "some updated password",
-               "username" => "some updated username"
+               "email" => "test1@gmail.com",
+               "username" => "test1"
              } = json_response(conn, 200)["data"]
     end
 

@@ -7,9 +7,6 @@ defmodule Twitter2.Users.User do
     field :password, :string
     field :username, :string
     field :otp_secret, :string
-    # Virtual fields
-    field :password_hash, :string, virtual: true
-    field :password_confirmation, :string, virtual: true
 
     has_many :tweets, Twitter2.Tweets.Tweet
     has_many :likes, Twitter2.Likes.Like
@@ -20,18 +17,17 @@ defmodule Twitter2.Users.User do
   @doc false
   def changeset(user, attrs) do
     user
-    |> cast(attrs, [:username, :email, :password_hash, :password_confirmation, :otp_secret])
-    |> validate_required([:username, :email, :password_hash, :password_confirmation, :otp_secret])
+    |> cast(attrs, [:username, :email, :password, :otp_secret])
+    |> validate_required([:username, :email, :password, :otp_secret])
     |> unique_constraint(:email)
     |> validate_format(:email, ~r/@/)
-    |> validate_length(:password_hash, min: 4)
-    |> validate_confirmation(:password_hash)
+    |> validate_length(:password, min: 4)
     |> put_password_hash
   end
 
   defp put_password_hash(changeset) do
     case changeset do
-      %Ecto.Changeset{valid?: true, changes: %{password_hash: pass}} ->
+      %Ecto.Changeset{valid?: true, changes: %{password: pass}} ->
         put_change(changeset, :password, Bcrypt.hash_pwd_salt(pass))
 
       _ ->

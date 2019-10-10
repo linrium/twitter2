@@ -4,59 +4,19 @@ defmodule Twitter2Web.TweetController do
 
   alias Twitter2.Tweets
   alias Twitter2.Tweets.Tweet
-  alias Twitter2.Users
-  alias Twitter2.Users.User
-  alias Twitter2.Likes
   alias Twitter2.Likes.Like
   alias Twitter2.Repo
 
   action_fallback Twitter2Web.FallbackController
 
   def index(conn, params) do
-    sort_by = if is_nil(params["sort_by"]), do: "", else: params["sort_by"]
-    sort_by_data = String.split(sort_by, ",", trim: true)
-
-    values =
-      sort_by_data
-      |> Enum.reduce([], fn el, acc ->
-        tmp = String.split(el, "-", trim: true)
-        key = Enum.at(tmp, 0)
-        type = Enum.at(tmp, 1)
-
-        if type == "1" do
-          acc ++ [desc: String.to_atom(key)]
-        else
-          acc ++ [asc: String.to_atom(key)]
-        end
-      end)
-
-    tweets =
-      Repo.all(
-        from t in Tweet,
-          join: u in assoc(t, :user),
-          left_join: o in assoc(t, :original_tweet),
-          left_join: ou in assoc(o, :user),
-          left_join: l in Like,
-          on: l.user_id == t.user_id and l.tweet_id == t.id,
-          select_merge: %{
-            liked_by_me: is_nil(l.id),
-            user: u,
-            original_tweet: o,
-            original_user: ou
-          }
-      )
-
-    IO.inspect(tweets)
-
-    # |> Repo.preload([:user, original_tweet: :user])
+    tweets = Tweets.list_tweets(params)
 
     render(conn, "index.json", tweets: tweets)
   end
 
   def create(conn, %{"tweet" => tweet_params}) do
     user = Guardian.Plug.current_resource(conn)
-
-    IO.inspect(user)
 
     with false <- is_nil(tweet_params["original_tweet_id"]),
          fetched_tweet <- Tweets.get_tweet!(tweet_params["original_tweet_id"]) do
@@ -89,6 +49,7 @@ defmodule Twitter2Web.TweetController do
 
   def show(conn, %{"id" => id}) do
     tweet = Tweets.get_tweet!(id)
+
     render(conn, "show.json", tweet: tweet)
   end
 

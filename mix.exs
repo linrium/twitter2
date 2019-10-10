@@ -48,7 +48,8 @@ defmodule Twitter2.MixProject do
       {:guardian, "~> 1.2"},
       {:guardian_db, "~> 2.0"},
       {:one_time_pass_ecto, "~> 1.0"},
-      {:cors_plug, "~> 2.0"}
+      {:cors_plug, "~> 2.0"},
+      {:ex_machina, "~> 2.3"}
     ]
   end
 

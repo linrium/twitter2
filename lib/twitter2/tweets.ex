@@ -7,6 +7,7 @@ defmodule Twitter2.Tweets do
   alias Twitter2.Repo
 
   alias Twitter2.Tweets.Tweet
+  alias Twitter2.Likes.Like
 
   @doc """
   Returns the list of tweets.
@@ -19,6 +20,38 @@ defmodule Twitter2.Tweets do
   """
   def list_tweets do
     Repo.all(Tweet)
+  end
+
+  def list_tweets(params) do
+    sort_by = if is_nil(params["sort_by"]), do: "", else: params["sort_by"]
+    sort_by_data = String.split(sort_by, ",", trim: true)
+
+    values =
+      sort_by_data
+      |> Enum.reduce([], fn el, acc ->
+        tmp = String.split(el, "-", trim: true)
+        key = Enum.at(tmp, 0)
+        type = Enum.at(tmp, 1)
+
+        if type == "1" do
+          acc ++ [desc: String.to_atom(key)]
+        else
+          acc ++ [asc: String.to_atom(key)]
+        end
+      end)
+
+    Repo.all(
+      from t in Tweet,
+        join: u in assoc(t, :user),
+        left_join: l in Like,
+        on: l.user_id == t.user_id and l.tweet_id == t.id,
+        select_merge: %{
+          liked_by_me: not is_nil(l.id),
+          user: u
+        },
+        preload: [original_tweet: :user],
+        order_by: ^values
+    )
   end
 
   @doc """
@@ -35,7 +68,20 @@ defmodule Twitter2.Tweets do
       ** (Ecto.NoResultsError)
 
   """
-  def get_tweet!(id), do: Repo.get!(Tweet, id)
+  def get_tweet!(id) do
+    Repo.one(
+      from t in Tweet,
+        join: u in assoc(t, :user),
+        left_join: l in Like,
+        on: l.user_id == t.user_id and l.tweet_id == t.id,
+        select_merge: %{
+          liked_by_me: not is_nil(l.id),
+          user: u
+        },
+        preload: [original_tweet: :user],
+        where: t.id == ^id
+    )
+  end
 
   @doc """
   Creates a tweet.
