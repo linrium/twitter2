@@ -73,13 +73,15 @@ defmodule Twitter2Web.TweetControllerTest do
   end
 
   describe "update tweet" do
-    setup [:create_tweet]
+    # setup [:create_tweet]
 
-    test "renders tweet when data is valid", %{conn: conn, tweet: %Tweet{id: id} = tweet} do
-      conn = put(conn, Routes.tweet_path(conn, :update, tweet), tweet: @update_attrs)
-      x = json_response(conn, 200)["data"]
-      IO.inspect(x)
-      assert %{"id" => ^id} = x
+    test "renders tweet when data is valid", %{conn: conn} do
+      conn = post(conn, Routes.tweet_path(conn, :create), tweet: @create_attrs)
+      tweet = json_response(conn, 201)["data"]
+      assert %{"id" => id} = tweet
+
+      conn = put(conn, Routes.tweet_path(conn, :update, %Tweet{id: id}), tweet: @update_attrs)
+      assert %{"id" => ^id} = json_response(conn, 200)["data"]
 
       conn = get(conn, Routes.tweet_path(conn, :show, id))
 
@@ -93,24 +95,31 @@ defmodule Twitter2Web.TweetControllerTest do
              } = json_response(conn, 200)["data"]
     end
 
-    test "renders errors when data is invalid", %{conn: conn, tweet: tweet} do
-      conn = put(conn, Routes.tweet_path(conn, :update, tweet), tweet: @invalid_attrs)
+    test "renders errors when data is invalid", %{conn: conn} do
+      conn = post(conn, Routes.tweet_path(conn, :create), tweet: @create_attrs)
+      tweet = json_response(conn, 201)["data"]
+      assert %{"id" => id} = tweet
+
+      conn = put(conn, Routes.tweet_path(conn, :update, %Tweet{id: id}), tweet: @invalid_attrs)
       assert json_response(conn, 422)["errors"] != %{}
     end
   end
 
-  # describe "delete tweet" do
-  #   setup [:create_tweet]
+  describe "delete tweet" do
+    # setup [:create_tweet]
 
-  #   test "deletes chosen tweet", %{conn: conn, tweet: tweet} do
-  #     conn = delete(conn, Routes.tweet_path(conn, :delete, tweet))
-  #     assert response(conn, 204)
+    test "deletes chosen tweet", %{conn: conn} do
+      conn = post(conn, Routes.tweet_path(conn, :create), tweet: @create_attrs)
+      tweet = json_response(conn, 201)["data"]
+      assert %{"id" => id} = tweet
 
-  #     assert_error_sent 404, fn ->
-  #       get(conn, Routes.tweet_path(conn, :show, tweet))
-  #     end
-  #   end
-  # end
+      conn = delete(conn, Routes.tweet_path(conn, :delete, %Tweet{id: id}))
+      assert response(conn, 204)
+
+      conn = get(conn, Routes.tweet_path(conn, :show, id))
+      assert is_nil(json_response(conn, 200)["data"])
+    end
+  end
 
   defp create_tweet(_) do
     tweet = fixture(:tweet)
