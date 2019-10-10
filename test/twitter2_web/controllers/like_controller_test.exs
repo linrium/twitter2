@@ -3,79 +3,89 @@ defmodule Twitter2Web.LikeControllerTest do
 
   alias Twitter2.Likes
   alias Twitter2.Likes.Like
+  alias Twitter2.Users
+  alias Twitter2.Tweets
+  alias Twitter2.Auth
 
-  @create_attrs %{
-
+  @create_tweet_attrs %{
+    content: "dau long hai a to nga"
   }
-  @update_attrs %{
-
+  @create_user_attrs %{
+    "email" => "test0@gmail.com",
+    "username" => "test0",
+    "password" => "123456"
   }
-  @invalid_attrs %{}
+  @invalid_attrs %{
+    tweet_id: "-1"
+  }
 
-  def fixture(:like) do
-    {:ok, like} = Likes.create_like(@create_attrs)
-    like
+  def fixture(:tweet) do
+    {:ok, tweet} = Tweets.create_tweet(@create_tweet_attrs)
+
+    tweet
+  end
+
+  def fixture(:user) do
+    {:ok, user} = Users.create_user(@create_user_attrs)
+
+    user
   end
 
   setup %{conn: conn} do
-    {:ok, conn: put_req_header(conn, "accept", "application/json")}
+    user = fixture(:user)
+    data = Auth.gen_token(user, true)
+
+    {:ok,
+     conn:
+       conn
+       |> put_req_header("accept", "application/json")
+       |> put_req_header("authorization", "Bearer #{data.token}")}
   end
 
-  describe "index" do
-    test "lists all likes", %{conn: conn} do
-      conn = get(conn, Routes.like_path(conn, :index))
-      assert json_response(conn, 200)["data"] == []
-    end
-  end
-
-  describe "create like" do
+  describe "like" do
     test "renders like when data is valid", %{conn: conn} do
-      conn = post(conn, Routes.like_path(conn, :create), like: @create_attrs)
+      conn = post(conn, Routes.tweet_path(conn, :create), tweet: @create_tweet_attrs)
       assert %{"id" => id} = json_response(conn, 201)["data"]
 
-      conn = get(conn, Routes.like_path(conn, :show, id))
+      conn =
+        post(conn, Routes.like_path(conn, :like),
+          like: %{
+            "tweet_id" => id
+          }
+        )
+
+      data = json_response(conn, 201)["data"]
 
       assert %{
                "id" => id
-             } = json_response(conn, 200)["data"]
+             } = data
+    end
+
+    test "renders unlike when data is valid", %{conn: conn} do
+      conn = post(conn, Routes.tweet_path(conn, :create), tweet: @create_tweet_attrs)
+      assert %{"id" => id} = json_response(conn, 201)["data"]
+
+      conn =
+        post(conn, Routes.like_path(conn, :like),
+          like: %{
+            "tweet_id" => id
+          }
+        )
+
+      conn =
+        post(conn, Routes.like_path(conn, :like),
+          like: %{
+            "tweet_id" => id
+          }
+        )
+
+      assert response(conn, 204)
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, Routes.like_path(conn, :create), like: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "update like" do
-    setup [:create_like]
-
-    test "renders like when data is valid", %{conn: conn, like: %Like{id: id} = like} do
-      conn = put(conn, Routes.like_path(conn, :update, like), like: @update_attrs)
-      assert %{"id" => ^id} = json_response(conn, 200)["data"]
-
-      conn = get(conn, Routes.like_path(conn, :show, id))
-
-      assert %{
-               "id" => id
-             } = json_response(conn, 200)["data"]
-    end
-
-    test "renders errors when data is invalid", %{conn: conn, like: like} do
-      conn = put(conn, Routes.like_path(conn, :update, like), like: @invalid_attrs)
-      assert json_response(conn, 422)["errors"] != %{}
-    end
-  end
-
-  describe "delete like" do
-    setup [:create_like]
-
-    test "deletes chosen like", %{conn: conn, like: like} do
-      conn = delete(conn, Routes.like_path(conn, :delete, like))
-      assert response(conn, 204)
-
-      assert_error_sent 404, fn ->
-        get(conn, Routes.like_path(conn, :show, like))
-      end
+      IO.puts(Routes.like_path(conn, :like))
+      conn = post(conn, Routes.like_path(conn, :like), like: @invalid_attrs)
+      assert response(conn, 400)
     end
   end
 

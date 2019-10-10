@@ -3,6 +3,7 @@ defmodule Twitter2Web.LikeController do
 
   alias Twitter2.Likes
   alias Twitter2.Likes.Like
+  alias Twitter2.Tweets
   alias Twitter2.Repo
 
   action_fallback Twitter2Web.FallbackController
@@ -14,18 +15,26 @@ defmodule Twitter2Web.LikeController do
 
   def like(conn, %{"like" => like_params}) do
     user = Guardian.Plug.current_resource(conn)
-    fetched_like = Repo.get_by(Like, user_id: user.id, tweet_id: like_params["tweet_id"])
+    tweet_id = like_params["tweet_id"]
 
-    if fetched_like == nil do
-      with {:ok, %Like{} = like} <-
-             Likes.create_like(Map.merge(like_params, %{"user_id" => user.id})) do
-        conn
-        |> put_status(:created)
-        |> render("show.json", like: like)
-      end
+    fetched_tweet = Tweets.get_tweet!(tweet_id)
+
+    if fetched_tweet == nil do
+      conn |> put_status(400) |> json(%{message: "tweet does not exsists"})
     else
-      with {:ok, %Like{}} <- Likes.delete_like(fetched_like) do
-        send_resp(conn, :no_content, "")
+      fetched_like = Repo.get_by(Like, user_id: user.id, tweet_id: tweet_id)
+
+      if fetched_like == nil do
+        with {:ok, %Like{} = like} <-
+               Likes.create_like(Map.merge(like_params, %{"user_id" => user.id})) do
+          conn
+          |> put_status(:created)
+          |> render("show.json", like: like)
+        end
+      else
+        with {:ok, %Like{}} <- Likes.delete_like(fetched_like) do
+          send_resp(conn, :no_content, "")
+        end
       end
     end
   end
