@@ -68,7 +68,9 @@ defmodule Twitter2.Tweets do
       ** (Ecto.NoResultsError)
 
   """
-  def get_tweet!(id) do
+  def get_tweet!(id), do: Repo.get!(Tweet, id)
+
+  def get_tweet!(id, :preloaded) do
     Repo.one(
       from t in Tweet,
         join: u in assoc(t, :user),

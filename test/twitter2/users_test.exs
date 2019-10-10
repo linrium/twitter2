@@ -6,9 +6,9 @@ defmodule Twitter2.UsersTest do
   describe "users" do
     alias Twitter2.Users.User
 
-    @valid_attrs %{email: "test@gmail.com", password: "123456", username: "test"}
-    @update_attrs %{email: "test@1gmail.com", username: "test1"}
-    @invalid_attrs %{email: nil, password: nil, username: nil}
+    @valid_attrs %{"email" => "test@gmail.com", "password" => "123456", "username" => "test"}
+    @update_attrs %{"email" => "test1@gmail.com", "username" => "test1"}
+    @invalid_attrs %{"email" => nil, "password" => nil, "username" => nil}
 
     def user_fixture(attrs \\ %{}) do
       {:ok, user} =
@@ -21,6 +21,7 @@ defmodule Twitter2.UsersTest do
 
     test "list_users/0 returns all users" do
       user = user_fixture()
+      users = Users.list_users()
       assert Users.list_users() == [user]
     end
 
