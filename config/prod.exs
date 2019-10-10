@@ -16,7 +16,7 @@ config :twitter2, Twitter2Web.Endpoint,
   secret_key_base: System.get_env("SECRET_KEY_BASE")
 
 # Configure your database
-config :hello_phoenix, Twitter2Web.Repo,
+config :hello_phoenix, Twitter2.Repo,
   adapter: Ecto.Adapters.Postgres,
   url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
