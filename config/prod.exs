@@ -10,10 +10,11 @@ use Mix.Config
 # which you should run after static files are built and
 # before starting your production server.
 config :twitter2, Twitter2Web.Endpoint,
+  http: [port: {:system, "PORT"}],
   url: [scheme: "https", host: "sheltered-brook-01438.herokuapp.com", port: 443],
   force_ssl: [rewrite_on: [:x_forwarded_proto]],
   cache_static_manifest: "priv/static/cache_manifest.json",
-  secret_key_base: System.get_env("SECRET_KEY_BASE")
+  secret_key_base: "jhWhCmUJ2PXWfg650I8d8CzWTkxTxp0kscLvMnMzykIHhMRYz7xJaHz8HARVbktW"
 
 # Do not print debug messages in production
 config :logger, level: :info
@@ -22,7 +23,8 @@ config :logger, level: :info
 config :twitter2, Twitter2.Repo,
   adapter: Ecto.Adapters.Postgres,
   database: "twitter2_prod",
-  url: System.get_env("DATABASE_URL"),
+  url:
+    "postgres://mdjdyoywmwuhbn:70a164150f6e896aab978c7d96ee13a2245334f39227aa066d5a803046a351f0@ec2-174-129-43-40.compute-1.amazonaws.com:5432/d9fvosrklh01r2",
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
   ssl: true
 
