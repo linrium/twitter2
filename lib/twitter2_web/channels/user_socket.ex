@@ -1,6 +1,7 @@
 defmodule Twitter2Web.UserSocket do
   use Phoenix.Socket
 
+  transport(:websocket, Phoenix.Transports.WebSocket, timeout: 45_000)
   ## Channels
   # channel "room:*", Twitter2Web.RoomChannel
 
