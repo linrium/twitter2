@@ -19,10 +19,10 @@ defmodule Twitter2Web.AuthController do
 
   def sign_in(conn, %{"email" => email, "password" => password}) do
     case Auth.sign_in(email, password) do
-      {:error, %Ecto.Changeset{} = changeset} ->
+      {:error, :unauthorized} ->
         conn
         |> put_status(:unauthorized)
-        |> json(EctoHelper.convert_changeset_errors(changeset))
+        |> json(%{message: "Wrong email or password"})
 
       result ->
         conn |> render("jwt.json", data: result)

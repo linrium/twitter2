@@ -31,24 +31,26 @@ defmodule Twitter2Web.Router do
   end
 
   # Other scopes may use custom stacks.
-  scope "/api", Twitter2Web do
+  scope "/api/v1", Twitter2Web do
     pipe_through [:api, :jwt_authenticated]
 
     post "/sign-out", AuthController, :sign_out
     post "/gen-otp", AuthController, :gen_otp
     post "/verify-otp", AuthController, :verify_otp
+    get "/ping-otp", PageController, :ping
   end
 
-  scope "/api", Twitter2Web do
+  scope "/api/v1", Twitter2Web do
     pipe_through [:api, :jwt_verified_otp]
 
+    get "/ping", PageController, :ping
     resources "/users", UserController, except: [:new, :edit]
     resources "/tweets", TweetController, except: [:new, :edit]
     # resources "/likes", LikeController, except: [:new, :edit]
     post "/likes", LikeController, :like
   end
 
-  scope "/api", Twitter2Web do
+  scope "/api/v1", Twitter2Web do
     pipe_through [:api]
 
     post "/sign-up", AuthController, :sign_up
