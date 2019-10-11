@@ -19,6 +19,7 @@ defmodule Twitter2.Users.User do
     user
     |> cast(attrs, [:username, :email, :password, :otp_secret])
     |> validate_required([:username, :email, :password, :otp_secret])
+    |> unique_constraint(:username)
     |> unique_constraint(:email)
     |> validate_format(:email, ~r/@/)
     |> validate_length(:password, min: 4)

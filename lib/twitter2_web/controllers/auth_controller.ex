@@ -3,6 +3,7 @@ defmodule Twitter2Web.AuthController do
 
   alias Twitter2.Auth
   alias Twitter2.Guardian
+  alias Twitter2.EctoHelper
 
   action_fallback Twitter2Web.FallbackController
 
@@ -12,16 +13,28 @@ defmodule Twitter2Web.AuthController do
 
     conn
     |> json(%{
-      message: "Logout success"
+      message: "Signout success"
     })
   end
 
   def sign_in(conn, %{"email" => email, "password" => password}) do
     case Auth.sign_in(email, password) do
-      {:error, _} ->
+      {:error, %Ecto.Changeset{} = changeset} ->
         conn
         |> put_status(:unauthorized)
-        |> json(%{error: "Login error"})
+        |> json(EctoHelper.convert_changeset_errors(changeset))
+
+      result ->
+        conn |> render("jwt.json", data: result)
+    end
+  end
+
+  def sign_up(conn, params) do
+    case Auth.sign_up(params) do
+      {:error, %Ecto.Changeset{} = changeset} ->
+        conn
+        |> put_status(:bad_request)
+        |> json(EctoHelper.convert_changeset_errors(changeset))
 
       result ->
         conn |> render("jwt.json", data: result)
@@ -45,11 +58,5 @@ defmodule Twitter2Web.AuthController do
     else
       {:error, :unauthorized}
     end
-  end
-
-  def sign_up(conn, params) do
-    result = Auth.sign_up(params)
-
-    conn |> render("jwt.json", data: result)
   end
 end
