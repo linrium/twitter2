@@ -105,22 +105,6 @@ defmodule Twitter2Web.TweetControllerTest do
     end
   end
 
-  describe "delete tweet" do
-    # setup [:create_tweet]
-
-    test "deletes chosen tweet", %{conn: conn} do
-      conn = post(conn, Routes.tweet_path(conn, :create), tweet: @create_attrs)
-      tweet = json_response(conn, 201)["data"]
-      assert %{"id" => id} = tweet
-
-      conn = delete(conn, Routes.tweet_path(conn, :delete, %Tweet{id: id}))
-      assert response(conn, 204)
-
-      conn = get(conn, Routes.tweet_path(conn, :show, id))
-      assert is_nil(json_response(conn, 200)["data"])
-    end
-  end
-
   defp create_tweet(_) do
     tweet = fixture(:tweet)
     {:ok, tweet: tweet}
