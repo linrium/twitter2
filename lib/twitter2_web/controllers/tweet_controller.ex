@@ -66,8 +66,12 @@ defmodule Twitter2Web.TweetController do
     user = Guardian.Plug.current_resource(conn)
     tweet = Tweets.get_tweet!(id, user)
 
-    with {:ok, %Tweet{}} <- Tweets.delete_tweet(tweet) do
-      send_resp(conn, :no_content, "")
+    if tweet == nil do
+      conn |> put_status(400) |> json(%{error: "tweet not found"})
+    else
+      with {:ok, %Tweet{}} <- Tweets.delete_tweet(tweet) do
+        send_resp(conn, :no_content, "")
+      end
     end
   end
 end

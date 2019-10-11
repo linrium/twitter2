@@ -44,8 +44,8 @@ defmodule Twitter2Web.Router do
     pipe_through [:api, :jwt_verified_otp]
 
     get "/ping", PageController, :ping
-    resources "/users", UserController, except: [:new, :edit]
-    resources "/tweets", TweetController, except: [:new, :edit]
+    resources "/users", UserController, except: [:new, :edit, :delete]
+    resources "/tweets", TweetController, except: [:new, :edit, :delete]
     # resources "/likes", LikeController, except: [:new, :edit]
     post "/likes", LikeController, :like
   end
