@@ -8,7 +8,8 @@ defmodule Twitter2Web.TweetController do
   action_fallback Twitter2Web.FallbackController
 
   def index(conn, params) do
-    tweets = Tweets.list_tweets(params)
+    user = Guardian.Plug.current_resource(conn)
+    tweets = Tweets.list_tweets(params, user)
 
     render(conn, "index.json", tweets: tweets)
   end

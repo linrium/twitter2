@@ -22,7 +22,7 @@ defmodule Twitter2.Tweets do
     Repo.all(Tweet)
   end
 
-  def list_tweets(params) do
+  def list_tweets(params, user) do
     sort_by = if is_nil(params["sort_by"]), do: "", else: params["sort_by"]
     sort_by_data = String.split(sort_by, ",", trim: true)
 
@@ -44,7 +44,7 @@ defmodule Twitter2.Tweets do
       from t in Tweet,
         join: u in assoc(t, :user),
         left_join: l in Like,
-        on: l.user_id == t.user_id and l.tweet_id == t.id,
+        on: l.user_id == ^user.id and l.tweet_id == t.id,
         select_merge: %{
           liked_by_me: not is_nil(l.id),
           user: u
@@ -75,7 +75,7 @@ defmodule Twitter2.Tweets do
       from t in Tweet,
         join: u in assoc(t, :user),
         left_join: l in Like,
-        on: l.user_id == t.user_id and l.tweet_id == t.id,
+        on: l.user_id == t and l.tweet_id == t.id,
         select_merge: %{
           liked_by_me: not is_nil(l.id),
           user: u
