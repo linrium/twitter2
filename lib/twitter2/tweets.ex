@@ -68,14 +68,16 @@ defmodule Twitter2.Tweets do
       ** (Ecto.NoResultsError)
 
   """
-  def get_tweet!(id), do: Repo.get!(Tweet, id)
+  def get_tweet!(id) do
+    Repo.get(Tweet, id)
+  end
 
-  def get_tweet!(id, :preloaded) do
+  def get_tweet!(id, user) do
     Repo.one(
       from t in Tweet,
         join: u in assoc(t, :user),
         left_join: l in Like,
-        on: l.user_id == t and l.tweet_id == t.id,
+        on: l.user_id == ^user.id and l.tweet_id == t.id,
         select_merge: %{
           liked_by_me: not is_nil(l.id),
           user: u

@@ -4,6 +4,7 @@ defmodule Twitter2Web.LikeController do
   alias Twitter2.Likes
   alias Twitter2.Likes.Like
   alias Twitter2.Tweets
+  alias Twitter2.Tweets.Tweet
   alias Twitter2.Repo
 
   action_fallback Twitter2Web.FallbackController

@@ -83,7 +83,6 @@ defmodule Twitter2Web.LikeControllerTest do
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      IO.puts(Routes.like_path(conn, :like))
       conn = post(conn, Routes.like_path(conn, :like), like: @invalid_attrs)
       assert response(conn, 400)
     end

@@ -76,7 +76,6 @@ defmodule Twitter2.TweetsTest do
       user = user_fixture()
       tweet = tweet_fixture(%{"user_id" => user.id})
       assert {:ok, %Tweet{}} = Tweets.delete_tweet(tweet)
-      assert_raise Ecto.NoResultsError, fn -> Tweets.get_tweet!(tweet.id) end
     end
 
     test "change_tweet/1 returns a tweet changeset" do

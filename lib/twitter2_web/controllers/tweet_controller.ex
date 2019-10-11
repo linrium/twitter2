@@ -47,13 +47,15 @@ defmodule Twitter2Web.TweetController do
   end
 
   def show(conn, %{"id" => id}) do
-    tweet = Tweets.get_tweet!(id, :preloaded)
+    user = Guardian.Plug.current_resource(conn)
+    tweet = Tweets.get_tweet!(id, user)
 
     render(conn, "show.json", tweet: tweet)
   end
 
   def update(conn, %{"id" => id, "tweet" => tweet_params}) do
-    tweet = Tweets.get_tweet!(id, :preloaded)
+    user = Guardian.Plug.current_resource(conn)
+    tweet = Tweets.get_tweet!(id, user)
 
     with {:ok, %Tweet{} = tweet} <- Tweets.update_tweet(tweet, tweet_params) do
       render(conn, "show.json", tweet: tweet)
@@ -61,7 +63,8 @@ defmodule Twitter2Web.TweetController do
   end
 
   def delete(conn, %{"id" => id}) do
-    tweet = Tweets.get_tweet!(id, :preloaded)
+    user = Guardian.Plug.current_resource(conn)
+    tweet = Tweets.get_tweet!(id, user)
 
     with {:ok, %Tweet{}} <- Tweets.delete_tweet(tweet) do
       send_resp(conn, :no_content, "")
